@@ -88,14 +88,18 @@
                         </div>
 
                         <div class="tight bigger">
-                            <strong>From:</strong>
-                            <t t-esc="move_lines.location_id.display_name"/>
+                            <strong>Location : </strong>
+                           <span t-field="o.location_id.name"/>
                         </div>
+                        <!--<div class="tight bigger">-->
+                        <!--    <strong>From:</strong>-->
+                        <!--    <t t-esc="move_lines.location_id.display_name"/>-->
+                        <!--</div>-->
 
-                        <div class="tight bigger">
-                            <strong>To:</strong>
-                            <t t-esc="move_lines.location_dest_id.display_name"/>
-                        </div>
+                        <!--<div class="tight bigger">-->
+                        <!--    <strong>To:</strong>-->
+                        <!--    <t t-esc="move_lines.location_dest_id.display_name"/>-->
+                        <!--</div>-->
 
                     </div>
 
@@ -176,15 +180,14 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        <br/>
-                                        <span class="bigger-title">
-                                            <strong>Location:</strong>
-                                        </span>
-                                        <strong>
-                                            <span class="bigger-title" t-field="o.location_id.name"/>
-                                            <br/>
-                                        </strong>
-                                        <br/>
+                                        From :
+                                        <span t-esc="move_lines.location_id.display_name"/>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        To :
+                                        <span t-esc="move_lines.location_dest_id.display_name"/>
                                     </th>
                                 </tr>
                             </thead>
