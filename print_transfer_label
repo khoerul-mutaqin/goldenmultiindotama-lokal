@@ -87,7 +87,7 @@
                             <t t-esc="picking_receipt.name"/>
                         </div>
 
-                        <div class="tight bigger">
+                        <div class="tight bigger" style="font-size: 60px !important;">
                             <strong>Location : </strong>
                            <span t-field="o.location_id.name"/>
                         </div>
@@ -180,14 +180,15 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        From :
-                                        <span t-esc="move_lines.location_id.display_name"/>
-                                    </th>
-                                </tr>
-                                <tr>
-                                    <th>
-                                        To :
-                                        <span t-esc="move_lines.location_dest_id.display_name"/>
+                                        <span style="font-size: 60px !important;">
+                                            From :
+                                        </span>
+                                        <span style="font-size: 60px !important;" t-esc="move_lines.location_id.display_name"/>
+                                        <br/>
+                                        <span style="font-size: 60px !important;">
+                                            To :
+                                        </span>
+                                        <span style="font-size: 60px !important;" t-esc="move_lines.location_dest_id.display_name"/>
                                     </th>
                                 </tr>
                             </thead>
