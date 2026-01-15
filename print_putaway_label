@@ -4,50 +4,22 @@
     <t t-set="uom_unit_id" t-value="env.ref('uom.product_uom_unit').id"/>
     <t t-set="gs1_uom_patterns" t-value="{rule.associated_uom_id.id: rule.pattern[1:4] + str(len(str('{:.10f}'.format(rule.associated_uom_id.rounding).rstrip('0')).split('.')[1])) for rule in env['barcode.rule'].search([('associated_uom_id','!=',False),('associated_uom_id.id','!=',uom_unit_id),('is_gs1_nomenclature','=',True)])}"/>
 
-    <style>
-            /* Hilangkan padding bawaan halaman */
-            .page {
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-        
-            /* Perkecil margin global dokumen */
-            @page {
-                size: A4 landscape;
-                margin: 5mm 8mm !important;
-            }
-        
-            /* Header lebih rapat */
-            .header-block {
-                margin-bottom: 4px !important;
-            }
-        
-            /* Baris detail produk lebih rapat */
-            .tight-row {
-                margin-bottom: 2px !important;
-                padding: 0 !important;
-                line-height: 1.15 !important;
-            }
-        
+
+    <style>        
             /* Teks lebih besar */
             .bigtitle {
-                font-size: 30px !important;
-                line-height: 1.1 !important;
-                margin-bottom: 4px !important;
+                font-size: 25px !important;
             }
         
             .bigger {
-                font-size: 30px !important;
-                line-height: 1.2 !important;
+                font-size: 25px !important;
             }
         
             table.table th, table.table td {
-                padding: 3px 5px !important;
-                font-size: 30px !important;
+                font-size: 25px !important;
             }
             .bigger-title {
-                font-size: 60px !important;
-                line-height: 1.2 !important;
+                font-size: 40px !important;
             }
     </style>
 
