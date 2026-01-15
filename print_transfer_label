@@ -158,10 +158,13 @@
                         <t t-set="aggregate_barcodes" t-value="product_quants.get_aggregate_barcodes()"/>
 
                         <!-- PACK DATE -->
+                        <t t-set="internal_quants" t-value="env['stock.move.line'].search([('reference', '=', picking.name)], limit=1)"/>
+                        <!-- PACK DATE -->
                         <div class="row tight bigger">
                             <div t-if="o.pack_date" class="col">
                                 <strong>Room:</strong>
-                                <span t-field="o.location_id.cdp_room_type"/>
+                                <span t-field="internal_quants.location_dest_id.cdp_room_type"/>
+                                <!--<span t-esc="o.name"/>-->
                             </div>
                         </div>
                         <div class="row tight bigger">
