@@ -139,12 +139,13 @@
                         <t t-set="product_quants" t-value="package_quants.filtered(lambda q: q.product_id.id == product.id)"/>
                         <t t-set="display_content_details" t-value="0 &lt; len(product_quants.lot_id) &lt; 50"/>
                         <t t-set="aggregate_barcodes" t-value="product_quants.get_aggregate_barcodes()"/>
-
+                        <t t-set="internal_quants" t-value="env['stock.move.line'].search([('reference', '=', picking.name)], limit=1)"/>
                         <!-- PACK DATE -->
                         <div class="row tight bigger">
                             <div t-if="o.pack_date" class="col">
                                 <strong>Room:</strong>
-                                <span t-field="o.location_id.cdp_room_type"/>
+                                <span t-field="internal_quants.location_dest_id.cdp_room_type"/>
+                                <!--<span t-esc="o.name"/>-->
                             </div>
                         </div>
                         <div class="row tight bigger">
@@ -156,12 +157,12 @@
                         <div class="row tight bigger">
                             <div t-if="o.pack_date" class="col">
                                 <strong>Area :</strong>
-                                <span style="background-color: yellow;" t-field="o.location_id.location_id"/>
+                                <span style="background-color: yellow;" t-field="internal_quants.location_dest_id.location_id"/>
                             </div>
                         </div>
                         <!--<t t-foreach="product_quants.filtered(lambda q: q.location_id.usage == 'internal')" t-as="quant" class="bigger" style="margin-bottom:6px;">-->
-                        <t t-set="internal_quants" t-value="package_quants.filtered(lambda q: q.location_id.usage == 'internal' and q.product_id and q.product_id.display_name and q.quantity)"/>
-                        <!--<t t-set="internal_quants" t-value="package_quants.filtered(lambda q:q.location_id.usage == 'internal' and q.product_id and q.product_id.display_name and q.quantity)"/>-->
+                        <!--<t t-set="internal_quants" t-value="package_quants.filtered(lambda q: q.location_id.usage == 'internal' and q.product_id and q.product_id.display_name and q.quantity)"/>-->
+                        <t t-set="internal_quants" t-value="env['stock.move.line'].search([('reference', '=', picking.name)], limit=1)"/>
                         <table t-if="internal_quants" class="table table-sm table-bordered w-100" style="margin-top:10px;">
                             <thead>
                                 <tr>
@@ -171,7 +172,7 @@
                                         </span>
                                         <br/>
                                         <strong>
-                                            <span class="bigger-title" t-field="o.location_id.name"/>
+                                            <span class="bigger-title" t-field="internal_quants.location_dest_id.name"/>
                                         </strong>
                                     </th>
                                 </tr>
