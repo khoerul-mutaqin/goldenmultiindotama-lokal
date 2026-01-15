@@ -1,0 +1,237 @@
+<t t-name="studio_report_document">
+<t t-call="web.basic_layout">
+
+    <t t-set="uom_unit_id" t-value="env.ref('uom.product_uom_unit').id"/>
+    <t t-set="gs1_uom_patterns" t-value="{rule.associated_uom_id.id: rule.pattern[1:4] + str(len(str('{:.10f}'.format(rule.associated_uom_id.rounding).rstrip('0')).split('.')[1])) for rule in env['barcode.rule'].search([('associated_uom_id','!=',False),('associated_uom_id.id','!=',uom_unit_id),('is_gs1_nomenclature','=',True)])}"/>
+
+    <style>
+            /* Hilangkan padding bawaan halaman */
+            .page {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        
+            /* Perkecil margin global dokumen */
+            @page {
+                size: A4 landscape;
+                margin: 5mm 8mm !important;
+            }
+        
+            /* Header lebih rapat */
+            .header-block {
+                margin-bottom: 4px !important;
+            }
+        
+            /* Baris detail produk lebih rapat */
+            .tight-row {
+                margin-bottom: 2px !important;
+                padding: 0 !important;
+                line-height: 1.15 !important;
+            }
+        
+            /* Teks lebih besar */
+            .bigtitle {
+                font-size: 30px !important;
+                line-height: 1.1 !important;
+                margin-bottom: 4px !important;
+            }
+        
+            .bigger {
+                font-size: 30px !important;
+                line-height: 1.2 !important;
+            }
+        
+            table.table th, table.table td {
+                padding: 3px 5px !important;
+                font-size: 30px !important;
+            }
+            .bigger-title {
+                font-size: 60px !important;
+                line-height: 1.2 !important;
+            }
+    </style>
+
+    <t t-foreach="docs.sorted(key=lambda r: r.location_id.id, reverse=False)" t-as="o">
+        <!--<t t-foreach="docs" t-as="o">-->
+        <t t-if="o.quant_ids">
+
+            <t t-set="package_quants" t-value="o.quant_ids.filtered('quantity')"/>
+            <t t-set="picking_receipt" t-value="env['stock.picking'].search([('picking_type_code', '=', 'incoming'),('name', '=', picking.origin)], limit=1)"/>
+
+            <div class="page">
+
+                <!-- HEADER -->
+                <div class="row" style="margin-bottom: 8px;">
+
+                    <!-- LEFT -->
+                    <div class="col-6 text-center">
+                        <div class="bigtitle">Putaway Label</div>
+                        <div class="bigtitle">No Pallet: <span t-field="o.name"/>
+                        </div>
+                        <!--<div class="bigtitle" t-field="o.name"/>-->
+
+                        <div class="tight bigger">
+                            <strong>PO Customer:</strong>
+                            <t t-esc="picking_receipt.origin"/>
+                        </div>
+
+                        <div class="tight bigger">
+                            <strong>SO GMI:</strong>
+                            <t t-esc="picking_receipt.cdp_so_contract_id.name"/>
+                        </div>
+
+                        <div class="tight bigger">
+                            <strong>NO GR:</strong>
+                            <t t-esc="picking_receipt.name"/>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div class="col-6 text-center">
+                        <div class="tight bigger">
+                                Dicetak:
+                            <t t-esc="(datetime.datetime.today() + datetime.timedelta(hours=7)).strftime('%d-%m-%Y %H:%M')"/>
+                        </div>
+
+                        <t t-if="o.valid_sscc">
+                            <t t-set="barcode" t-value="'00' + o.name"/>
+                            <t t-if="o.pack_date" t-set="barcode" t-value="barcode + '13' + o.pack_date.strftime('%y%m%d')"/>
+                            <div t-out="barcode" t-options="{'widget': 'barcode', 'symbology': 'QR','width':100,'height':100}" style="margin-bottom:4px;"/>
+                        </t>
+
+                        <t t-else="">
+                            <div t-field="o.name" t-options="{'widget': 'barcode','width':520,'height':80,'img_style':'width:260px;height:45px;'}"/>
+                            <div class="tight bigger" t-field="o.name"/>
+                            <div class="tight bigger">
+                                <strong>Customer:</strong>
+                                <t t-esc="picking.partner_id.name"/>
+                            </div>
+                            <div class="tight bigger">
+                                <strong>Customer Code:</strong>
+                                <t t-esc="picking.partner_id.ref"/>
+                            </div>
+                            <div class="tight bigger">
+                                <strong>Nopol Vehicle:</strong>
+                                <t t-esc="picking_receipt.x_studio_no_kendaraan"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- PACK DATE -->
+                <!--<div class="row tight bigger">-->
+                <!--    <div t-if="o.pack_date" class="col">-->
+                <!--        <strong>Room:</strong>-->
+                <!--        <span t-field="o.pack_date"/>-->
+                <!--    </div>-->
+                <!--</div>-->
+                <!--<div class="row tight bigger">-->
+                <!--    <div t-if="o.pack_date" class="col">-->
+                <!--        <strong>Pack Date:</strong>-->
+                <!--        <span t-field="o.pack_date"/>-->
+                <!--    </div>-->
+                <!--</div>-->
+
+                <!-- CONTENT -->
+                <div class="content-section">
+                    <t t-foreach="package_quants.product_id" t-as="product">
+
+                        <t t-set="product_quants" t-value="package_quants.filtered(lambda q: q.product_id.id == product.id)"/>
+                        <t t-set="display_content_details" t-value="0 &lt; len(product_quants.lot_id) &lt; 50"/>
+                        <t t-set="aggregate_barcodes" t-value="product_quants.get_aggregate_barcodes()"/>
+
+                        <!-- PACK DATE -->
+                        <div class="row tight bigger">
+                            <div t-if="o.pack_date" class="col">
+                                <strong>Room:</strong>
+                                <span t-field="o.location_id.cdp_room_type"/>
+                            </div>
+                        </div>
+                        <div class="row tight bigger">
+                            <div t-if="o.pack_date" class="col">
+                                <strong>Pack Date:</strong>
+                                <span t-field="o.pack_date"/>
+                            </div>
+                        </div>
+                        <div class="row tight bigger">
+                            <div t-if="o.pack_date" class="col">
+                                <strong>Area :</strong>
+                                <span style="background-color: yellow;" t-field="o.location_id.location_id"/>
+                            </div>
+                        </div>
+                        <!--<t t-foreach="product_quants.filtered(lambda q: q.location_id.usage == 'internal')" t-as="quant" class="bigger" style="margin-bottom:6px;">-->
+                        <t t-set="internal_quants" t-value="package_quants.filtered(lambda q: q.location_id.usage == 'internal' and q.product_id and q.product_id.display_name and q.quantity)"/>
+                        <!--<t t-set="internal_quants" t-value="package_quants.filtered(lambda q:q.location_id.usage == 'internal' and q.product_id and q.product_id.display_name and q.quantity)"/>-->
+                        <table t-if="internal_quants" class="table table-sm table-bordered w-100" style="margin-top:10px;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <span class="bigger-title">
+                                            <strong>Location:</strong>
+                                        </span>
+                                        <br/>
+                                        <strong>
+                                            <span class="bigger-title" t-field="o.location_id.name"/>
+                                        </strong>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <table t-if="internal_quants" class="table table-sm table-bordered w-100">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div t-foreach="internal_quants" t-as="quant" class="bigger" style="margin-bottom:10px;">
+
+                                            <div>
+                                                <strong>Description:</strong>
+                                                <strong>
+                                                    <t t-esc="quant.product_id.display_name"/>
+                                                </strong>
+                                            </div>
+
+                                            <div t-if="quant.lot_id">
+                                                <strong>Lot/Batch:</strong>
+                                                <strong>
+                                                    <t t-esc="quant.lot_id.name"/>
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <strong>Quantity:</strong>
+                                                <strong>
+                                                    <t t-esc="quant.quantity"/>
+                                                </strong>
+                                                <strong>
+                                                    <t t-esc="quant.product_id.uom_id.name"/>
+                                                </strong>
+                                            </div>
+
+                                            <div t-if="quant.lot_id and quant.lot_id.expiration_date">
+                                                <strong>Expiry:</strong>
+                                                <strong>
+                                                    <span t-field="quant.lot_id.expiration_date" t-options="{'widget':'date'}"/>
+                                                </strong>
+                                            </div>
+
+                                            <hr/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!--</t>-->
+                    </t>
+                </div>
+            </div>
+
+            <p style="page-break-after: always;"/>
+
+        </t>
+    </t>
+
+
+</t>
+
+</t>
