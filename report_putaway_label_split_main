@@ -1,0 +1,8 @@
+<t t-name="studio_main_report">
+    <!-- simpan picking aktif -->
+    <t t-set="picking" t-value="docs"/>
+     <!--ambil packages dari picking -->
+    <t t-set="x_studio_split_transfer" t-value="picking.x_studio_split_transfer.name"/>
+    <t t-set="docs" t-value="docs.move_line_ids.mapped('result_package_id')"/>
+    <t t-call="studio_customization.studio_report_docume_855169bf-6237-47be-8318-54d668ae2c37_document"/>   
+</t>
