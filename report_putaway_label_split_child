@@ -22,9 +22,15 @@
                 font-size: 40px !important;
             }
     </style>
+    
+    <!--prepare before split-->
+    <t t-set="split_package" t-value="picking.x_studio_split_transfer.move_line_ids.mapped('result_package_id')"/>
+
     <t t-if="picking.x_studio_split_transfer">
         <t t-foreach="docs" t-as="o">
-            <t t-if="o.quant_ids">
+            <!--<t t-if="o.quant_ids" >-->
+            <t t-if="o.quant_ids and o in split_package">
+
         
                 <t t-set="package_quants" t-value="o.quant_ids.filtered('quantity')"/>
                 <t t-set="picking_receipt" t-value="env['stock.picking'].search([('picking_type_code', '=', 'incoming'),('name', '=', x_studio_split_transfer)], limit=1)"/>
